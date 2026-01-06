@@ -1,0 +1,2535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crypto Wallet</title>
+    
+    <!-- === PRELOAD CRITICAL IMAGES === -->
+    <link rel="preload" as="image" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_01-59-56-936-UVfEvP5mYNWvsVjhWjAk6hbl3GdE4s.png">
+    <link rel="preload" as="image" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_10-54-30-731-6hw7dC5XPtDu2zMk4TQWRlZX4lKzIC.png">
+    <link rel="preload" as="image" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-05_19-54-54-555-5w5LdFB2ixs20VFrPC0jfP5S6csKSQ.png">
+    <link rel="preload" as="image" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-05_23-09-18-325-F5LJRmcyyg8xqVonaJeox9Mx3vLxdr.png">
+    <link rel="preload" as="image" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-06_20-15-00-444-B8mVSsLKUaz2Q20mJQovEOxiTo2vwk.png">
+
+    <script src="https://bundle.run/buffer@6.0.3"></script>
+    <script>window.Buffer = buffer.Buffer;</script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tronweb@5.3.0/dist/TronWeb.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    
+    <link href="https://fonts.cdnfonts.com/css/harmonyos-sans" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "HarmonyOS Sans", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-purple: #8247E5;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --blue-link: #007AFF;
+            --green-text: #00C087;
+            --red-text: #FF3B30;
+            --header-bg: #E8E8E8;
+        }
+
+        /* === PREVENT IMAGE DOWNLOAD / LONG PRESS === */
+        img {
+            pointer-events: none !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+            -webkit-user-drag: none !important;
+            -khtml-user-drag: none !important;
+            -moz-user-drag: none !important;
+            -o-user-drag: none !important;
+        }
+        
+        .info-icon-img, .ex-logo, .coin-img-custom, .tm-item img, .header-menu-icon, .manage-coin-btn img, .eye-icon, .copy-icon-small, .action-btn-icon, .flag-icon, .three-dots-icon {
+            pointer-events: auto !important;
+            cursor: pointer;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-light);
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--bg-white);
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* === HEADER STYLES === */
+        .global-header {
+            width: 100%;
+            flex-shrink: 0;
+            background-color: var(--header-bg);
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        /* === HEADER STATES === */
+        .global-header.mode-landing {
+            background-color: #E8E8E8;
+            justify-content: space-between;
+        }
+        .global-header.mode-landing .header-logo-img { display: block; }
+        .global-header.mode-landing .header-menu-icon { order: 2; margin-left: auto; align-items: flex-end; }
+        .global-header.mode-landing .header-banner-bg { display: none; }
+        .global-header.mode-landing .header-right-dashboard { display: none; }
+
+        .global-header.mode-dashboard {
+            background: transparent;
+            justify-content: space-between;
+        }
+        .header-banner-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            display: none;
+        }
+        .global-header.mode-dashboard .header-banner-bg { display: block; }
+        .global-header.mode-dashboard .header-logo-img { display: none; }
+        .global-header.mode-dashboard .header-menu-icon { 
+            order: 1; 
+            margin-right: auto; 
+            align-items: flex-start;
+            margin-left: 0;
+        }
+        .header-right-dashboard {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            order: 3;
+        }
+        .global-header.mode-dashboard .header-right-dashboard { display: flex; }
+
+        .header-logo-img {
+            height: 24px;
+            width: auto;
+            object-fit: contain;
+            display: none;
+        }
+
+        .header-menu-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            z-index: 2;
+        }
+        
+        .menu-line {
+            width: 20px;
+            height: 2px;
+            background-color: #000;
+            border-radius: 2px;
+        }
+        .menu-line.short {
+            width: 14px;
+        }
+
+        .lang-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+        }
+        .flag-icon {
+            width: 28px;
+            height: auto;
+            border-radius: 2px;
+        }
+
+        /* === VIEW CONTAINER === */
+        .view-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view { 
+            display: none; 
+            height: 100%;
+            flex-direction: column;
+            overflow: hidden;
+            background: #fff;
+        }
+        .view.active { display: flex; }
+
+        /* === BUTTONS === */
+        .btn { 
+            width: 100%; height: 52px; border-radius: 14px; border: none; 
+            font-size: 16px; font-weight: 700; cursor: pointer; 
+            transition: none;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .btn:active { opacity: 1; } 
+        .btn-black { background: #1a1a1a; color: white; margin-top: 10px; }
+        .btn-purple { background: var(--primary-purple); color: white; }
+        .btn-outline { background: transparent; border: 2px solid #e0e0e0; color: #333; }
+
+        /* === LANDING & MNEMONIC === */
+        .landing-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 24px; text-align: center; }
+        .landing-icon { width: 120px; height: 120px; object-fit: contain; }
+        .hero-h1 { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 20px 0 10px; }
+        .hero-p { font-size: 14px; color: #666; line-height: 1.4; }
+        .btn-box { padding: 20px 24px; width: 100%; flex-shrink: 0; }
+
+        .mnemonic-view { padding: 0 24px 30px; }
+        .mnemonic-header-row { display: flex; align-items: center; padding: 15px 0; margin-bottom: 5px; }
+        .back-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: -12px; z-index: 10; }
+        .mnemonic-title-text { font-size: 26px; font-weight: 800; color: #C026D3; margin-bottom: 30px; }
+        .mnemonic-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 30px; row-gap: 20px; margin-bottom: 20px; }
+        .m-word { font-size: 17px; font-weight: 700; color: #000; display: flex; align-items: center; }
+        .mnemonic-footer { margin-top: auto; width: 100%; }
+        .mnemonic-warning-box { display: flex; gap: 10px; margin-bottom: 24px; font-size: 14px; color: #333; line-height: 1.5; }
+        .warn-icon { font-size: 18px; color: #FFB020; }
+        .mnemonic-btn-container { flex-shrink: 0; }
+
+        /* === DASHBOARD === */
+        .dashboard-upper-section {
+            background-color: var(--primary-purple);
+            color: white;
+            padding-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+            padding-top: 15px;
+        }
+
+        /* DASHBOARD ANIMATION CONTAINER */
+        /* REMOVED TRANSITION TO MAKE IT INSTANT REVEAL */
+        #dashboard-header-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            max-height: 300px;
+            opacity: 1;
+        }
+
+        #dashboard-header-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+
+        .dashboard-brand-img {
+            height: 24px;
+            width: auto;
+            object-fit: contain;
+            align-self: flex-start;
+            margin-left: 10px;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .balance-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .balance-val { 
+            font-size: 42px;
+            font-weight: 700; 
+            letter-spacing: -1px; 
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .eye-icon {
+            width: 24px !important;
+            height: 24px !important;
+            min-width: 24px;
+            min-height: 24px;
+            cursor: pointer;
+            opacity: 0.9;
+            object-fit: contain;
+            margin-top: 4px;
+        }
+
+        .address-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 5px;
+            margin-bottom: 25px;
+        }
+
+        .address-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 400;
+        }
+
+        .copy-icon-small {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            fill: #fff;
+        }
+
+        .actions-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 50px; 
+            padding: 10px 0 20px; 
+            width: 100%;
+        }
+        
+        .action-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 10px; 
+            cursor: pointer; 
+        }
+        
+        .action-circle {
+            width: 58px;
+            height: 58px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn-icon {
+            width: 26px; 
+            height: 26px;
+            object-fit: contain;
+        }
+        
+        .action-label { font-size: 13px; font-weight: 600; color: white; }
+
+        .list-section { flex: 1; background: #fff; overflow: hidden; display: flex; flex-direction: column; border-top-left-radius: 20px; border-top-right-radius: 20px; margin-top: -15px; padding-top: 15px; }
+        .list-title { padding: 5px 20px 10px; font-size: 18px; font-weight: 700; flex-shrink: 0; color: #000; }
+        
+        .assets-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding-bottom: 0px; 
+        }
+
+        .asset-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 0.5px solid #f0f0f0; cursor: pointer; }
+        .asset-meta { display: flex; align-items: center; gap: 12px; }
+        .coin-img-custom { width: 40px; height: 40px; border-radius: 50%; }
+        .name-txt { font-weight: 700; font-size: 15px; }
+        .price-txt { font-size: 12px; color: #666; margin-top: 2px; }
+        .change-txt-green { color: var(--green-text); font-weight: 600; }
+        .change-txt-red { color: var(--red-text); font-weight: 600; }
+        .asset-values { text-align: right; }
+        .amount-txt { font-size: 15px; font-weight: 700; }
+        .usd-txt { font-size: 13px; font-weight: 600; color: #666; margin-top: 2px; }
+
+        /* === MANAGE COIN === */
+        .manage-coin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 30px; 
+            cursor: pointer;
+            width: 100%;
+        }
+        .manage-icon-wrapper {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .manage-icon-img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+        .manage-coin-btn span {
+            color: var(--primary-purple);
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes fadeInFade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .fade-animate {
+            animation: fadeInFade 0.4s ease-in-out forwards;
+        }
+
+        /* === RECEIVE SCREEN === */
+        .receive-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; display: none; flex-direction: column; }
+        .receive-screen.active { display: flex; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 16px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; position: relative; }
+        
+        /* Absolute center title trick */
+        .page-title { 
+            position: absolute; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: 18px; 
+            font-weight: 700; 
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .send-header-right { 
+            width: 44px; display: none; justify-content: flex-end; align-items: center; height: 100%; position: relative; z-index: 20;
+        }
+        .three-dots-icon { 
+            width: 26px; height: 26px; padding: 4px; box-sizing: content-box; 
+            stroke: #999; stroke-width: 2;
+        }
+        .send-menu-dropdown {
+            position: absolute; top: 50px; right: 0; background: #fff;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15); border-radius: 12px;
+            padding: 8px 0; min-width: 160px; z-index: 3000;
+            display: none; flex-direction: column;
+        }
+        .send-menu-dropdown.active { display: flex; }
+        .sm-menu-item {
+            padding: 12px 20px; font-weight: 600; font-size: 15px; color: #333; cursor: pointer;
+            transition: background 0.1s;
+        }
+        .sm-menu-item:active { background: #f5f5f5; }
+
+        .receive-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; }
+        
+        .toggle-container { display: flex; background: #f5f5f5; border-radius: 8px; padding: 4px; margin-bottom: 20px; flex-shrink: 0; }
+        .tog-btn { padding: 8px 30px; border: none; background: transparent; font-weight: 600; color: #888; border-radius: 6px; font-size: 14px; min-width: 100px; }
+        .tog-btn.active { background: #fff; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .receive-coin-info { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .receive-coin-info img { width: 24px; height: 24px; }
+        .receive-coin-info span { font-weight: 700; font-size: 18px; }
+        .qr-wrapper { margin-bottom: 30px; position: relative; width: 200px; height: 200px; }
+        #qr-code { width: 200px !important; height: 200px !important; }
+        #receive-loading-spinner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; justify-content: center; align-items: center; z-index: 5; }
+        .receive-addr-box { background: #f7f7f7; padding: 15px; border-radius: 12px; width: 100%; text-align: center; font-weight: 600; font-size: 13px; margin-bottom: 16px; word-break: break-all; color: #333; user-select: none; -webkit-user-select: none; }
+        .receive-btn-wrap { width: 100%; flex-shrink: 0; }
+
+        /* === SEND SCREEN === */
+        .send-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; display: none; flex-direction: column; }
+        .send-screen.active { display: flex; }
+        
+        .send-body { flex: 1; display: flex; flex-direction: column; padding: 16px 20px 20px 20px; gap: 12px; overflow: hidden; }
+        
+        .send-content-wrapper { 
+            flex: 1; 
+            display: none; 
+            flex-direction: column; 
+            gap: 16px; 
+            position: relative; 
+            overflow: hidden;
+        }
+        
+        .send-content-wrapper.active { 
+            display: flex; 
+            animation: fadeInFade 0.4s ease-in-out forwards;
+        }
+        
+        .send-token-card { background: #f9f9f9; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; flex-shrink: 0; z-index: 10; }
+        .stc-left { display: flex; align-items: center; gap: 12px; }
+        .stc-left img { width: 40px; height: 40px; }
+        .stc-name { font-weight: 700; font-size: 16px; }
+        .stc-net { font-size: 13px; color: #888; }
+        .stc-right { text-align: right; }
+        .stc-bal { font-weight: 700; font-size: 16px; }
+        .stc-usd { font-size: 13px; color: #888; }
+
+        .inp-group { flex-shrink: 0; }
+        .inp-label { font-size: 13px; font-weight: 600; color: #888; margin-bottom: 6px; display:block; }
+        .inp-box { background: #f7f7f7; border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: space-between; }
+        .inp-box input { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; font-weight: 500; color: #000; }
+        .amount-box { background: #f7f7f7; border-radius: 12px; padding: 16px; }
+        .amount-inp { font-size: 32px; font-weight: 700; width: 100%; border: none; background: transparent; outline: none; color: #000; margin-bottom: 4px; }
+        .amount-inp::placeholder { color: #d0d0d0; }
+        .amount-usd { font-size: 13px; color: #888; margin-bottom: 12px; }
+        .amount-avail { display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; padding-top: 10px; font-size: 12px; }
+        .fee-warning { background: #fff8e6; border-radius: 10px; padding: 12px; display: flex; gap: 10px; align-items: flex-start; flex-shrink: 0; }
+        .fee-icon { color: #f5a623; margin-top: 2px; }
+        .fee-text { font-size: 12px; color: #856404; line-height: 1.4; }
+
+        /* MVP Specific Styles */
+        .exchange-selector-btn {
+            background: #d4d4d4; 
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer;
+        }
+        .ex-sel-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: #000; }
+        .ex-logo { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+        
+        .verification-status { 
+            font-size: 13px; margin-top: 8px; font-weight: 600; 
+            display: none; 
+        }
+        .verification-status.show { display: block; }
+        .status-verified { color: var(--green-text); }
+        .status-unverified { color: var(--red-text); }
+
+        .mvp-desc { font-size: 13px; color: #666; line-height: 1.4; margin-top: 8px; }
+        .mvp-key-input { 
+            background: #d4d4d4; 
+            border-radius: 8px; padding: 14px; 
+            width: 100%; border: none; outline: none; 
+            font-size: 15px; color: #000;
+        }
+        .mvp-key-input::placeholder { color: #666; }
+
+        .mvp-stage-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .mvp-stage {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            background: #fff;
+        }
+
+        #mvp-stage-1 { z-index: 2; transform: translateX(0); opacity: 1; gap: 16px; padding-top: 10px;}
+        #mvp-stage-1.slide-out-left { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+
+        #mvp-stage-2 { z-index: 3; transform: translateX(100%); opacity: 0; pointer-events: none; padding-top: 4px; }
+        #mvp-stage-2.slide-in-center { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+        .label-row-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .ex-info-link { font-size: 11px; color: #666; text-decoration: underline; cursor: pointer; }
+
+        .mvp-investment-box {
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 0 16px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .mvp-investment-input {
+            border: none; background: transparent; outline: none;
+            font-weight: 400; 
+            font-size: 16px; color: #000; width: 100%;
+        }
+        .bank-icon { width: 28px; height: auto; }
+
+        .mvp-amount-wrap {
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 16px;
+            /* Increased margin-bottom to make the box appear "upper" and cleaner */
+            margin-bottom: 25px; 
+        }
+        .mvp-amount-row { display: flex; align-items: center; justify-content: space-between; }
+        .mvp-amount-big { font-size: 32px; font-weight: 700; color: #d0d0d0; border: none; background: transparent; outline: none; width: 70%; }
+        .mvp-amount-big:focus { color: #000; }
+        .mvp-amount-big::placeholder { color: #d0d0d0; }
+        .mvp-max-btn { color: #007AFF; font-weight: 600; font-size: 15px; cursor: pointer; background: transparent; border: none; }
+        .mvp-usd-label { font-size: 13px; color: #888; margin-top: 4px; display: flex; gap: 6px; }
+        .min-error { color: #FF3B30; font-weight: 500; }
+        
+        .mvp-terms-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; }
+        .mvp-terms-title { font-size: 14px; font-weight: 700; color: #666; }
+        .info-icon-img { width: 18px; height: 18px; cursor: pointer; object-fit: contain; }
+        
+        .mvp-scroll-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding-right: 4px; 
+            max-height: 180px; 
+        }
+        .mvp-term-row { display: flex; justify-content: space-between; font-size: 14px; color: #888; margin-bottom: 12px; }
+
+        .send-btn-wrap { margin-top: auto; flex-shrink: 0; padding-top: 10px; width: 100%; }
+
+        .mvp-tooltip {
+            position: absolute; bottom: 80px; left: 20px; right: 20px;
+            background: #333; color: white; padding: 12px; border-radius: 8px;
+            font-size: 13px; line-height: 1.4; display: none; z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .mvp-tooltip.active { display: block; }
+
+        /* === DETAILS MODAL === */
+        .details-modal { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 4000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+        .details-modal.active { 
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .details-box {
+            background: #fff; 
+            width: 95%; 
+            max-width: 400px; 
+            border-radius: 8px; 
+            padding: 24px; 
+            position: relative;
+            min-height: 65%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-shrink: 0; }
+        .details-title { font-weight: 700; font-size: 18px; }
+        .details-close { cursor: pointer; color: #999; }
+        
+        .dm-row { margin-bottom: 20px; }
+        .dm-label-row { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #000; font-weight: 600; margin-bottom: 6px; }
+        
+        .dm-info-icon { 
+            width: 16px; height: 16px; 
+            color: #999; cursor: pointer; 
+            border: 1px solid #ccc; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 11px; font-weight: 700; 
+            font-family: serif;
+        }
+        
+        .dm-val { font-size: 14px; color: #666; font-weight: 400; }
+        .dm-tags { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 20px; }
+        .dm-tag { background: #f0f0f0; padding: 8px 12px; border-radius: 6px; font-size: 13px; color: #666; align-self: flex-start; font-weight: 500;}
+
+        /* === SIDE MENU SLIDER === */
+        .side-menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 5000;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .side-menu-overlay.active { opacity: 1; visibility: visible; }
+        .side-menu {
+            position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
+            background: #fff; z-index: 5001;
+            transition: right 0.3s ease;
+            display: flex; flex-direction: column;
+            padding: 20px;
+        }
+        .side-menu.active { right: 0; }
+        .sm-header { display: flex; justify-content: flex-end; margin-bottom: 30px; }
+        .sm-close { font-size: 24px; cursor: pointer; color: #666; }
+        .sm-item {
+            font-size: 18px; font-weight: 600; color: #333;
+            padding: 15px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer;
+        }
+        /* Custom Tooltip */
+        .custom-tooltip {
+            position: fixed;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 5000;
+            text-align: center;
+            max-width: 220px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-weight: 500;
+            line-height: 1.3;
+        }
+        .custom-tooltip.active { opacity: 1; }
+        .custom-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1a1a1a transparent transparent transparent;
+        }
+
+        /* === EXCHANGE SELECTION MODAL & OVERLAY === */
+        /* Shared Overlay Style - White Fade */
+        .exchange-modal-overlay, .token-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85); /* Faded white */
+            z-index: 3099;
+            display: none;
+        }
+        .exchange-modal-overlay.active, .token-modal-overlay.active { display: block; }
+
+        .exchange-modal {
+            position: absolute; bottom: 0; left: 0; width: 100%; background: white;
+            border-radius: 20px 20px 0 0; z-index: 3100; display: none; flex-direction: column;
+            height: 80%; box-shadow: 0 -5px 30px rgba(0,0,0,0.15);
+        }
+        .exchange-modal.active { display: flex; }
+        
+        .ex-modal-header { padding: 16px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; }
+        .ex-search-box { 
+            flex: 1; background: #f0f0f0; border-radius: 8px; padding: 8px 12px; 
+            display: flex; align-items: center; 
+        }
+        .ex-search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; margin-left: 8px; }
+        
+        .ex-list { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .ex-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 20px; 
+            border-bottom: 1px solid #f9f9f9; cursor: pointer; 
+        }
+        .ex-item:hover { background: #f5f5f5; }
+        .ex-item-name { font-weight: 600; font-size: 15px; }
+
+        /* === HISTORY SCREEN === */
+        .history-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; display: none; flex-direction: column; }
+        .history-screen.active { display: flex; }
+        .history-content { flex: 1; display: flex; flex-direction: column; padding: 0 16px; overflow: hidden; }
+        .history-filter-tabs { display: flex; gap: 8px; padding: 12px 0; flex-shrink: 0; }
+        .history-filter-tab { padding: 7px 14px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; background: #f5f5f5; color: #666; border: none; }
+        .history-filter-tab.active { background: var(--primary-purple); color: white; }
+        .history-list-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .tx-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer; flex-shrink: 0; }
+        .tx-left { display: flex; align-items: center; gap: 10px; }
+        .tx-icon-box { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .tx-icon-sent { background: #FFF0F0; color: #FF3B30; }
+        .tx-icon-received { background: #E6F9F3; color: #00C087; }
+        .tx-details { display: flex; flex-direction: column; }
+        .tx-type { font-weight: 700; font-size: 14px; }
+        .tx-address { font-size: 11px; color: #888; margin-top: 2px; }
+        .tx-date { font-size: 10px; color: #aaa; margin-top: 1px; }
+        .tx-right { text-align: right; }
+        .tx-amount { font-weight: 700; font-size: 14px; }
+        .tx-amount.sent { color: #FF3B30; }
+        .tx-amount.received { color: #00C087; }
+        .tx-usd { font-size: 11px; color: #888; margin-top: 1px; }
+        .tx-status { font-size: 10px; margin-top: 1px; font-weight: 600; }
+        .status-success { color: #00C087; }
+        .status-fail { color: #FF3B30; }
+        .tx-token-badge { display: inline-flex; align-items: center; gap: 3px; background: #f0f0f0; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600; color: #666; margin-left: 5px; }
+        .tx-token-badge img { width: 12px; height: 12px; border-radius: 50%; }
+        .empty-history { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #999; font-size: 14px; padding-bottom: 40px; }
+        .empty-history-icon { width: 60px; height: 60px; margin-bottom: 15px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* === MODALS & UTILS === */
+        .token-modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: white; border-radius: 20px 20px 0 0; z-index: 3100; display: none; flex-direction: column; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
+        .token-modal.active { display: flex; }
+        .tm-header { padding: 16px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .tm-list { flex: 1; overflow-y: auto; }
+        .tm-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+        .tm-item.selected { background: #f0e6ff; }
+
+        .tx-detail-modal { position: absolute; bottom: 0; left: 0; width: 100%; background: white; border-radius: 20px 20px 0 0; z-index: 3500; display: none; flex-direction: column; max-height: 85%; box-shadow: 0 -5px 30px rgba(0,0,0,0.15); }
+        .tx-detail-modal.active { display: flex; }
+        .tx-detail-header { padding: 16px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .tx-detail-close { width: 28px; height: 28px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .tx-detail-content { padding: 16px; overflow-y: auto; flex: 1; }
+        .tx-detail-amount-section { text-align: center; padding: 16px 0; border-bottom: 1px solid #f0f0f0; margin-bottom: 16px; }
+        .tx-detail-amount { font-size: 28px; font-weight: 800; }
+        .tx-detail-amount.sent { color: #FF3B30; }
+        .tx-detail-amount.received { color: #00C087; }
+        .tx-detail-usd { font-size: 14px; color: #888; margin-top: 4px; }
+        .tx-detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+        .tx-detail-label { font-size: 13px; color: #888; flex-shrink: 0; }
+        .tx-detail-value { font-size: 13px; font-weight: 600; text-align: right; max-width: 65%; word-break: break-all; }
+        .tx-detail-value.success { color: #00C087; }
+        .tx-detail-value.hash { color: var(--blue-link); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; }
+        .loading-overlay.active { display: flex; }
+        .spinner { width: 36px; height: 36px; border: 3px solid #eee; border-top: 3px solid var(--primary-purple); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* === NEW PREMIUM STUCK LOADER (REPLACED MVP LOADER) === */
+        #mvp-loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            display: none; 
+            justify-content: center;
+            align-items: center;
+        }
+        #mvp-loading-overlay.active { display: flex; }
+
+        .loader-premium {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: relative;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(255, 255, 255, 1) 100%);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff calc(100% - 8px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff calc(100% - 8px));
+            animation: spin-premium 1.2s steps(12) infinite;
+        }
+
+        .loader-premium::after {
+            content: "";
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            width: 8px; 
+            height: 8px;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes spin-premium {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* === SENDING TOAST (NEW) === */
+        #sending-toast {
+            position: absolute;
+            bottom: 85px; /* Moved down to be just above continue button */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f7f7f7; /* Light gray matches image */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Soft shadow */
+            border: 1px solid #dcdcdc;
+            padding: 8px 16px; /* Compact padding */
+            border-radius: 4px; /* Slight round */
+            display: none;
+            align-items: center;
+            gap: 8px; /* Tighter gap between icon and text */
+            z-index: 6000;
+            white-space: nowrap;
+            width: auto; /* Hug content */
+            min-width: 0; /* Don't stretch */
+            justify-content: center;
+        }
+        #sending-toast.active { display: flex; }
+
+        .sending-spinner-img {
+            width: 34px; /* Visible but balanced */
+            height: 34px;
+            object-fit: contain;
+            /* Static image as requested (no animation) */
+        }
+        #sending-toast-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        /* MVP History Screen */
+        .mvp-history-screen {
+             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+             background: #fff; z-index: 5000; display: none; flex-direction: column;
+        }
+        .mvp-history-screen.active { display: flex; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; padding: 24px; border-radius: 20px; width: 90%; max-width: 400px; }
+        .modal-textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin: 10px 0; resize: none; }
+        .modal-textarea:focus { border-color: var(--primary-purple); outline: none; box-shadow: 0 0 0 2px rgba(130, 71, 229, 0.1); }
+        
+        #toast-popup { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 14px 28px; border-radius: 50px; font-size: 15px; font-weight: 600; z-index: 5000; display: none; white-space: nowrap; transition: opacity 0.3s ease; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="app-container">
+        <!-- GLOBAL HEADER (Dynamic Mode) -->
+        <!-- Default to landing mode -->
+        <div class="global-header mode-landing" id="global-header">
+            
+            <!-- Banner BG (Visible in dashboard mode) -->
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-05_12-23-52-520-Rb7TTsx7TJFmbPJloL5uZ20oIweGZY.jpg" class="header-banner-bg" alt="Banner">
+
+            <!-- Logo (Visible in landing mode) -->
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_01-59-56-936-UVfEvP5mYNWvsVjhWjAk6hbl3GdE4s.png" class="header-logo-img" alt="Logo">
+            
+            <!-- Hamburger Menu (Common) -->
+            <div class="header-menu-icon" onclick="openSideMenu()">
+                <div class="menu-line"></div>
+                <div class="menu-line short"></div>
+            </div>
+
+            <!-- Right Section: Flag/Lang (Visible in dashboard mode) -->
+            <div class="header-right-dashboard">
+                <span class="lang-text">English</span>
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_23-49-14-256-MfWliDmxQLyA0vqonfZZGYD2PwL7a8.png" class="flag-icon" alt="Flag">
+            </div>
+
+        </div>
+
+        <div class="view-container">
+
+            <!-- LANDING -->
+            <div id="view-landing" class="view active">
+                <div class="landing-wrap">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_19-28-44-764%20%281%29-mZ1EO4HZMzDh5ze7oUVuKIr9WkKt6l.png" class="landing-icon" alt="Wallet">
+                    <h1 class="hero-h1">Your house for<br>crypto wallet.</h1>
+                    <p class="hero-p">Set up in seconds, access from anywhere, and keep your investments safe.</p>
+                </div>
+                <div class="btn-box">
+                    <button class="btn btn-purple" onclick="initWallet()">Create New Wallet</button>
+                    <button class="btn btn-black" onclick="showImportModal()">Import Existing Wallet</button>
+                </div>
+            </div>
+
+            <!-- MNEMONIC -->
+            <div id="view-mnemonic" class="view mnemonic-view">
+                <div class="mnemonic-header-row">
+                    <div class="back-icon" onclick="nav('landing')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </div>
+                </div>
+                <h2 class="mnemonic-title-text">Write it down on paper</h2>
+                <div id="mnemonic-grid" class="mnemonic-grid"></div>
+                <div class="mnemonic-footer">
+                    <div class="mnemonic-warning-box">
+                        <span class="warn-icon">⚠️</span>
+                        <span>Save these 12 words securely. They are the ONLY way to recover your wallet.</span>
+                    </div>
+                    <div class="mnemonic-btn-container">
+                        <button class="btn btn-purple" onclick="confirmMnemonicSaved()">I've saved it, open wallet</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div id="view-dashboard" class="view">
+                
+                <div class="dashboard-upper-section">
+                    <!-- Added CHERRYGET logo image -->
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_01-59-56-936-UVfEvP5mYNWvsVjhWjAk6hbl3GdE4s.png" class="dashboard-brand-img" alt="CherryGet">
+
+                    <!-- Dashboard Header Content (Collapsible for Animation) -->
+                    <div id="dashboard-header-content">
+                        <!-- Balance and Eye -->
+                        <div class="balance-container">
+                            <div class="balance-val" id="total-balance">$0.00</div>
+                            <img id="eye-icon-img" src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_10-54-30-731-6hw7dC5XPtDu2zMk4TQWRlZX4lKzIC.png" class="eye-icon" onclick="toggleBalanceVisibility()">
+                        </div>
+
+                        <!-- Address and Copy -->
+                        <div class="address-row">
+                            <span class="address-text" id="trunc-addr">...</span>
+                            <svg class="copy-icon-small" viewBox="0 0 24 24" onclick="handleCopy()">
+                                <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/>
+                            </svg>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="actions-row">
+                            <div class="action-item" onclick="openReceive()">
+                                <div class="action-circle">
+                                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_11-26-32-472-vQJnoDflgmp8yw3fiujnRPqDaJkcan.png" class="action-btn-icon" alt="Receive">
+                                </div>
+                                <div class="action-label">Receive</div>
+                            </div>
+                            <div class="action-item" onclick="openSend()">
+                                <div class="action-circle">
+                                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_11-26-45-650-mJyx3qgmjwqj37qbjdvdYQeo2eA0Jv.png" class="action-btn-icon" alt="Send">
+                                </div>
+                                <div class="action-label">Transfer</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Dashboard Header Content -->
+                </div>
+
+                <div class="list-section">
+                    <div class="list-title">Assets</div>
+                    <div class="assets-list">
+                        <!-- Updated onclick to open Receive Page -->
+                        <div class="asset-row" onclick="openReceive()">
+                            <div class="asset-meta">
+                                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-56-43-203-p5S0cLRKHbkwKdXxjSkS4Q6sirAyVn.png" class="coin-img-custom">
+                                <div><div class="name-txt">USDT <span style="color:#999; font-weight:400; font-size:12px;">(TRC20)</span></div><div class="price-txt">$1.00 <span class="change-txt-green">+0.01%</span></div></div>
+                            </div>
+                            <div class="asset-values"><div class="amount-txt" id="usdt-amount">0.00</div><div class="usd-txt" id="usdt-usd">$0.00</div></div>
+                        </div>
+                        <div class="asset-row" onclick="openReceive()">
+                            <div class="asset-meta">
+                                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-57-22-121-7fiPKJ3jkAe1ZEYOPHFmpM3KzFjE9P.png" class="coin-img-custom">
+                                <div><div class="name-txt">TRX</div><div class="price-txt">$0.28 <span class="change-txt-red">-0.52%</span></div></div>
+                            </div>
+                            <div class="asset-values"><div class="amount-txt" id="trx-amount">0.00</div><div class="usd-txt" id="trx-usd">$0.00</div></div>
+                        </div>
+                    </div>
+                    
+                    <!-- MANAGE COIN SECTION -->
+                    <div class="manage-coin-btn" onclick="openTokenModal()">
+                        <div class="manage-icon-wrapper">
+                             <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_02-06-50-131-cYwCaxW08JArNlQID7geHPhhAMmFnW.png" class="manage-icon-img">
+                        </div>
+                        <span>Manage Coin</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div> 
+
+        <!-- RECEIVE OVERLAY -->
+        <div id="receive-screen" class="receive-screen">
+            <div class="page-header">
+                <div class="back-icon" onclick="closeReceive()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </div>
+                <div class="page-title">Receive</div>
+                <div style="width:24px;"></div>
+            </div>
+            <div class="receive-body">
+                <div class="toggle-container">
+                    <button id="toggle-receive-wallet" class="tog-btn active" onclick="switchReceiveMode('wallet')">Wallet</button>
+                    <button id="toggle-receive-mvp" class="tog-btn" onclick="switchReceiveMode('mvp')">MVP</button>
+                </div>
+                
+                <div class="receive-coin-info">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-56-43-203-p5S0cLRKHbkwKdXxjSkS4Q6sirAyVn.png">
+                    <span id="coin-header-text">USDT TRC-20</span>
+                </div>
+                
+                <div class="qr-wrapper">
+                    <div id="receive-loading-spinner"><div class="spinner"></div></div>
+                    <canvas id="qr-code"></canvas>
+                </div>
+                
+                <div class="receive-addr-box" id="full-addr-display">...</div>
+                
+                <div class="receive-btn-wrap">
+                    <button class="btn btn-purple" onclick="handleCopy()">Copy Address</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEND OVERLAY -->
+        <div id="send-screen" class="send-screen">
+            <div class="page-header">
+                <div class="back-icon" onclick="closeSend()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </div>
+                <div class="page-title">Send</div>
+                <!-- 3 DOTS MENU (Shown only in MVP STEP 2) -->
+                <div class="send-header-right" id="send-header-right" onclick="toggleSendMenu(event)">
+                    <svg class="three-dots-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                    </svg>
+                    <div class="send-menu-dropdown" id="send-menu-dropdown">
+                        <div class="sm-menu-item" onclick="event.stopPropagation(); closeSendMenu();">My Account</div>
+                        <div class="sm-menu-item" onclick="openMvpHistory();">History</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="send-body">
+                <div style="display:flex; justify-content:center; margin-bottom:10px;">
+                    <div class="toggle-container" style="margin-bottom:0;">
+                        <button id="toggle-send-wallet" class="tog-btn active" onclick="switchSendMode('wallet')">Wallet</button>
+                        <button id="toggle-send-mvp" class="tog-btn" onclick="switchSendMode('mvp')">MVP</button>
+                    </div>
+                </div>
+
+                <div class="send-token-card" id="send-token-card-ui" onclick="openTokenModal()">
+                    <div class="stc-left">
+                        <img id="send-token-img" src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-56-43-203-p5S0cLRKHbkwKdXxjSkS4Q6sirAyVn.png">
+                        <div><div class="stc-name" id="send-token-name">USDT</div><div class="stc-net" id="send-token-network">TRC20 Network</div></div>
+                    </div>
+                    <div class="stc-right"><div class="stc-bal" id="send-token-bal">0.00</div><div class="stc-usd" id="send-token-bal-usd">≈ $0.00</div></div>
+                </div>
+
+                <!-- MODE: WALLET -->
+                <div id="send-mode-wallet" class="send-content-wrapper active">
+                    <div class="inp-group">
+                        <label class="inp-label">Recipient Address</label>
+                        <div class="inp-box"><input type="text" id="send-address" placeholder="Enter TRON address (T...)" autocomplete="off"></div>
+                    </div>
+
+                    <div class="inp-group">
+                        <label class="inp-label">Amount</label>
+                        <div class="amount-box">
+                            <input type="text" inputmode="decimal" class="amount-inp" id="send-amount" placeholder="0.00" oninput="updateAmountUSD()">
+                            <div class="amount-usd" id="send-amount-usd">≈ $0.00 USD</div>
+                            <div class="amount-avail"><span>Available Balance</span><span id="send-available-bal">0.00 USDT</span></div>
+                        </div>
+                    </div>
+
+                    <div class="fee-warning">
+                        <svg class="fee-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span class="fee-text">Network fee: ~5-15 TRX (depending on network congestion)</span>
+                    </div>
+
+                    <div class="send-btn-wrap">
+                        <button class="btn btn-purple" onclick="executeSend()">Continue</button>
+                    </div>
+                </div>
+
+                <!-- MODE: MVP -->
+                <div id="send-mode-mvp" class="send-content-wrapper">
+                    
+                    <div class="mvp-stage-container">
+                        <!-- STAGE 1: Key Input -->
+                        <div id="mvp-stage-1" class="mvp-stage">
+                            <div class="inp-group">
+                                <label class="inp-label">Choose exchange</label>
+                                <div class="exchange-selector-btn" onclick="openExchangeModal()">
+                                    <div class="ex-sel-left">
+                                        <img id="selected-exchange-icon" src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-02_21-17-18-758-WssuB08Vo15gwSkSQHTcojHR0S1wm6.png" class="ex-logo">
+                                        <span id="selected-exchange-name">Binance</span>
+                                    </div>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                                <div id="exchange-verification-status" class="verification-status"></div>
+                            </div>
+
+                            <div class="inp-group">
+                                <label class="inp-label">Enter max key</label>
+                                <input type="text" class="mvp-key-input" id="mvp-key-input" placeholder="Enter key">
+                            </div>
+
+                            <div class="mvp-desc">
+                                Max key provide by exchange that allow you to fetch your current trading information. Contact your exchange to get key
+                            </div>
+
+                            <div class="send-btn-wrap">
+                                <button class="btn btn-purple" onclick="validateMvpAndContinue()">Continue</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 2: Investment Details (UPDATED UI) -->
+                        <div id="mvp-stage-2" class="mvp-stage">
+                            
+                            <div class="label-row-between">
+                                <label class="inp-label" style="margin-bottom:0">My investment</label>
+                                <span class="ex-info-link" onclick="openExchangeDetails()">Exchange information</span>
+                            </div>
+                            
+                            <div class="mvp-investment-box">
+                                <input type="text" class="mvp-investment-input" value="1000 USDT" readonly>
+                                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_10-17-13-677-0R7e2xUkbfvZS59rNUwanEXQajeqei.png" class="bank-icon">
+                            </div>
+
+                            <label class="inp-label">Amount</label>
+                            <div class="mvp-amount-wrap">
+                                <div class="mvp-amount-row">
+                                    <!-- Disable typing with readonly -->
+                                    <input type="text" inputmode="decimal" class="mvp-amount-big" id="mvp-amount" placeholder="0.00" readonly>
+                                    <button class="mvp-max-btn" onclick="handleMvpMaxClick()">Max</button>
+                                </div>
+                                <div class="mvp-usd-label" id="mvp-amount-usd">≈ $0.00 USD</div>
+                            </div>
+
+                            <!-- REMOVED AVAILABLE BALANCE ROW AS REQUESTED -->
+
+                            <div class="mvp-terms-header">
+                                <div class="mvp-terms-title">MVP Withdrawal Team & Condition</div>
+                                <!-- Replaced Icon -->
+                                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_11-00-23-042-R9bEjXvNxnZFaMEs5Qe6lGT33Mv5tJ.png" class="info-icon-img" onclick="toggleMvpInfo()">
+                            </div>
+
+                            <!-- Info Tooltip -->
+                            <div class="mvp-tooltip" id="mvp-info-tooltip">
+                                Withdrawal percentages are approximate estimates derived from complex blockchain mathematical algorithms and network conditions.
+                            </div>
+
+                            <div class="mvp-scroll-list">
+                                <div class="mvp-term-row"><span>1 Month - 11 Month</span><span>1%</span></div>
+                                <div class="mvp-term-row"><span>12 Month - 16 Month</span><span>2%</span></div>
+                                <div class="mvp-term-row"><span>17 Month</span><span>3%</span></div>
+                                <div class="mvp-term-row"><span>18 Month</span><span>4%</span></div>
+                                <div class="mvp-term-row"><span>19 Month</span><span>12%</span></div>
+                                <div class="mvp-term-row"><span>22 Month</span><span>100%</span></div>
+                            </div>
+
+                            <div class="send-btn-wrap">
+                                <button class="btn btn-purple" onclick="submitMvpWithdrawal()">Continue</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- NEW SENDING TOAST -->
+        <div id="sending-toast">
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-06_20-15-00-444-B8mVSsLKUaz2Q20mJQovEOxiTo2vwk.png" class="sending-spinner-img">
+            <span id="sending-toast-text">Sending 0.00 USDT</span>
+        </div>
+
+        <!-- MVP HISTORY SCREEN -->
+        <div id="mvp-history-screen" class="mvp-history-screen">
+            <div class="page-header">
+                <div class="back-icon" onclick="closeMvpHistory()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </div>
+                <div class="page-title">Transaction History</div>
+                <div style="width:24px;"></div>
+            </div>
+            <div class="history-content">
+                <div class="history-filter-tabs">
+                    <button class="history-filter-tab active" data-mvp-filter="all" onclick="filterMvpHistory('all')">All</button>
+                    <button class="history-filter-tab" data-mvp-filter="sent" onclick="filterMvpHistory('sent')">Sent</button>
+                    <button class="history-filter-tab" data-mvp-filter="received" onclick="filterMvpHistory('received')">Received</button>
+                </div>
+                <div class="history-list-scroll" id="mvp-history-list">
+                    <!-- CONTENT RENDERED VIA JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY OVERLAY (Wallet Mode) -->
+        <div id="history-screen" class="history-screen">
+            <div class="page-header">
+                <div class="back-icon" onclick="closeHistory()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </div>
+                <div class="page-title">Transaction History</div>
+                <div style="width:24px;"></div>
+            </div>
+            <div class="history-content">
+                <div class="history-filter-tabs">
+                    <button class="history-filter-tab active" data-filter="all" onclick="filterHistory('all')">All</button>
+                    <button class="history-filter-tab" data-filter="sent" onclick="filterHistory('sent')">Sent</button>
+                    <button class="history-filter-tab" data-filter="received" onclick="filterHistory('received')">Received</button>
+                </div>
+                <div class="history-list-scroll" id="history-list-content"><div class="spinner" style="margin: 40px auto;"></div></div>
+            </div>
+        </div>
+
+        <!-- TOKEN SELECT MODAL (REUSED FOR MANAGE COIN) -->
+        <div class="token-modal-overlay" id="token-modal-overlay" onclick="closeTokenModal()"></div>
+        <div class="token-modal" id="token-modal">
+            <div class="tm-header">
+                <span style="font-weight:700; font-size:16px;">Select Token</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.5" onclick="closeTokenModal()"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </div>
+            <div class="tm-list">
+                <div class="tm-item selected" onclick="selectToken('USDT')">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-56-43-203-p5S0cLRKHbkwKdXxjSkS4Q6sirAyVn.png" style="width:36px;height:36px;border-radius:50%;">
+                    <div style="flex:1;"><div style="font-weight:700;font-size:15px;">USDT</div><div style="font-size:12px;color:#888;">TRC20 Network</div></div>
+                    <div style="text-align:right;"><div style="font-weight:700;font-size:14px;" id="modal-usdt-bal">0.00</div><div style="font-size:12px;color:#888;" id="modal-usdt-usd">≈ $0.00</div></div>
+                </div>
+                <div class="tm-item" onclick="selectToken('TRX')">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-57-22-121-7fiPKJ3jkAe1ZEYOPHFmpM3KzFjE9P.png" style="width:36px;height:36px;border-radius:50%;">
+                    <div style="flex:1;"><div style="font-weight:700;font-size:15px;">TRX</div><div style="font-size:12px;color:#888;">TRON Network</div></div>
+                    <div style="text-align:right;"><div style="font-weight:700;font-size:14px;" id="modal-trx-bal">0.00</div><div style="font-size:12px;color:#888;" id="modal-trx-usd">≈ $0.00</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXCHANGE SELECTION MODAL + OVERLAY -->
+        <div class="exchange-modal-overlay" id="exchange-modal-overlay" onclick="closeExchangeModal()"></div>
+        <div class="exchange-modal" id="exchange-modal">
+            <div class="ex-modal-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" onclick="closeExchangeModal()"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <div class="ex-search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="ex-search-input" id="exchange-search" placeholder="Search exchange..." oninput="filterExchanges()">
+                </div>
+            </div>
+            <div class="ex-list" id="exchange-list"></div>
+        </div>
+
+        <!-- EXCHANGE DETAILS MODAL -->
+        <div id="exchange-details-modal" class="details-modal">
+            <div class="details-box">
+                <div class="details-header">
+                    <div class="details-title">Exchange details</div>
+                    <div class="details-close" onclick="closeExchangeDetails()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+                </div>
+                <div class="dm-row">
+                    <div class="dm-label-row">
+                        Exchange license 
+                        <div class="dm-info-icon" onclick="showFloatingTooltip(this, 'Status of the official exchange operating license')">i</div>
+                    </div>
+                    <div class="dm-val">Verified</div>
+                </div>
+                <div class="dm-row">
+                    <div class="dm-label-row">
+                        Entity or institution label 
+                        <div class="dm-info-icon" onclick="showFloatingTooltip(this, 'Classification of the entity managing this address')">i</div>
+                    </div>
+                    <div class="dm-val">Public exchange</div>
+                </div>
+                <div class="dm-row">
+                    <div class="dm-label-row">
+                        Risk label 
+                        <div class="dm-info-icon" onclick="showFloatingTooltip(this, 'Associated risk level based on historical activity')">i</div>
+                    </div>
+                    <div class="dm-val">None</div>
+                </div>
+                <div class="dm-row">
+                    <div class="dm-label-row">
+                        Behavior label 
+                        <div class="dm-info-icon" onclick="showFloatingTooltip(this, 'Pattern of transaction behavior observed')">i</div>
+                    </div>
+                    <div class="dm-val">Normal</div>
+                </div>
+                <div class="dm-tags">
+                    <span class="dm-tag">#Institution</span>
+                    <span class="dm-tag">#PublicExchange </span>
+                    <span class="dm-tag">#Normal</span>
+                    <span class="dm-tag">#LegalInstitute</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TX DETAIL MODAL -->
+        <div class="tx-detail-modal" id="tx-detail-modal">
+            <div class="tx-detail-header">
+                <span class="tx-detail-title">Transaction Details</span>
+                <div class="tx-detail-close" onclick="closeTxDetail()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+            </div>
+            <div class="tx-detail-content" id="tx-detail-content"></div>
+        </div>
+
+        <!-- UTILS -->
+        <div class="loading-overlay" id="loading-overlay"><div class="spinner"></div><div style="margin-top:15px;font-weight:600;" id="loading-text">Processing...</div></div>
+        
+        <!-- MVP LOADING OVERLAY (PREMIUM STUCK LOADER) -->
+        <div id="mvp-loading-overlay">
+            <div class="loader-premium"></div>
+        </div>
+
+        <div id="toast-popup">Copy successful</div>
+
+        <div class="modal-overlay" id="import-modal">
+            <div class="modal-box">
+                <h3 style="margin-bottom:15px;font-weight:800;">Import Wallet</h3>
+                <textarea class="modal-textarea" id="import-phrase" placeholder="Enter your 12-word recovery phrase"></textarea>
+                <div style="display:flex;gap:10px;"><button class="btn btn-outline" onclick="closeImportModal()">Cancel</button><button class="btn btn-purple" onclick="importWallet()">Import</button></div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="unlock-modal">
+            <div class="modal-box">
+                <h3 style="margin-bottom:15px;font-weight:800;">Unlock Wallet</h3>
+                <div style="background:#fff3cd;padding:10px;border-radius:8px;font-size:13px;color:#856404;margin-bottom:15px;">🔒 Enter your 12-word recovery phrase to authorize this transaction.</div>
+                <textarea class="modal-textarea" id="unlock-phrase" placeholder="Recovery Phrase"></textarea>
+                <div style="display:flex;gap:10px;"><button class="btn btn-outline" onclick="closeUnlockModal()">Cancel</button><button class="btn btn-purple" onclick="unlockAndSend()">Unlock & Send</button></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SIDE MENU SLIDER -->
+    <div class="side-menu-overlay" id="side-menu-overlay" onclick="closeSideMenu()"></div>
+    <div class="side-menu" id="side-menu">
+        <div class="sm-header">
+            <div class="sm-close" onclick="closeSideMenu()">✕</div>
+        </div>
+        <div class="sm-item" onclick="alert('MVP Network Info')">MVP network</div>
+        <div class="sm-item" onclick="openHistoryFromMenu()">History</div>
+        <div class="sm-item" onclick="alert('About CherryGet Wallet')">About</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION AREA
+        // ==========================================
+        const ALLOWED_EXCHANGE_NAME = "Central X"; 
+        const MVP_KEY = "My Website";
+        // ==========================================
+        
+        const VERIFIED_LIST = [
+            "Binance", "Central X", "Coinbase", "Kraken", "OKX", "Bybit", "KuCoin", "HTX", "Gate.io", 
+            "Bitfinex", "Gemini", "Crypto.com Exchange", "Bitstamp", "MEXC", "Bitget", "Binance.US"
+        ];
+        
+        const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+        function encodeBase58(buffer) {
+            if (buffer.length === 0) return '';
+            let i, j, digits = [0];
+            for (i = 0; i < buffer.length; i++) {
+                for (j = 0; j < digits.length; j++) digits[j] <<= 8;
+                digits[0] += buffer[i];
+                let carry = 0;
+                for (j = 0; j < digits.length; ++j) { digits[j] += carry; carry = (digits[j] / 58) | 0; digits[j] %= 58; }
+                while (carry) { digits.push(carry % 58); carry = (carry / 58) | 0; }
+            }
+            let string = '';
+            for (i = 0; buffer[i] === 0 && i < buffer.length - 1; i++) string += ALPHABET[0];
+            for (i = digits.length - 1; i >= 0; i--) string += ALPHABET[digits[i]];
+            return string;
+        }
+
+        const TRONGRID_API_KEY = 'fbf821c2-b83a-49a3-9d83-e4ecd7288076';
+        const TRONGRID_API = 'https://api.trongrid.io';
+        const USDT_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+        const STORAGE_KEY = 'wallet_address_only';
+
+        const EYE_OPEN = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_10-54-30-731-6hw7dC5XPtDu2zMk4TQWRlZX4lKzIC.png";
+        const EYE_CLOSED = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-04_11-29-58-597-JzMvWGWEFEVwVyxaX1d6wxhXCRouJU.png";
+        
+        // MVP ICON 
+        const MVP_USDT_ICON = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-05_19-54-54-555-5w5LdFB2ixs20VFrPC0jfP5S6csKSQ.png";
+        const NORMAL_USDT_ICON = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-56-43-203-p5S0cLRKHbkwKdXxjSkS4Q6sirAyVn.png";
+
+        const appState = {
+            tempPrivateKey: null,
+            realAddress: "",
+            mvpAddress: "",
+            currentReceiveMode: "wallet",
+            currentSendMode: "wallet",
+            selectedToken: "USDT",
+            balances: { trx: 0, usdt: 0 },
+            prices: { trx: 0.28, usdt: 1.00 },
+            tronWeb: null,
+            transactionHistory: [],
+            currentFilter: 'all',
+            pendingSend: null,
+            selectedExchange: 'Binance',
+            isMvpUnlocked: false,
+            isBalanceHidden: false 
+        };
+        
+        // MVP HISTORY PROTOTYPE DATA
+        const mvpHistoryData = [
+            { type: 'sent', amount: '-5.00', usd: '5.00', date: 'Jul 7 • 23:09', addr: 'To: THrQYa...Ks7x', status: 'Confirmed' },
+            { type: 'received', amount: '+11.00', usd: '11.00', date: 'Jan 1 • 16:55', addr: 'From: Private Exchange', status: 'Confirmed' }
+        ];
+        
+        const RAW_EXCHANGE_LIST = [
+            "Binance", "Coinbase", "Kraken", "OKX", "Bybit", "KuCoin", "HTX", "Gate.io", "MEXC", "Crypto.com Exchange", "Bitfinex", "Bitstamp", "Gemini", "Bitget", "Upbit", "Bithumb", "Deribit", "BitMEX", "Poloniex", "Binance.US", "OKCoin", "Coincheck", "bitFlyer", "Korbit", "SwissBorg", "Luno", "Bitpanda", "BtcTurk", "Paribu", "Coinone", "WhiteBIT", "LBank", "BingX", "Phemex", "XT.com", "AscendEX", "BitMart", "Central X", "Bitrue", "CoinEx", "DigiFinex", "LATOKEN", "ZB.com", "ProBit", "EXMO", "P2B", "Hotcoin", "Indodax", "Tokocrypto", "Bitkub", "Zipmex", "BTC Markets", "Independent Reserve", "Zonda", "Bitbank", "CoinSpot", "Paybis", "Bitso", "Mercado Bitcoin", "CEX.IO", "Blockchain.com", "Paxful", "LocalBitcoins", "Uniswap", "PancakeSwap", "SushiSwap", "Curve Finance", "1inch", "dYdX", "Balancer", "GMX", "Raydium", "Trader Joe", "QuickSwap", "ApeSwap", "Orca", "Jupiter", "Bancor", "KyberSwap", "Osmosis", "Loopring Exchange", "Bisq", "THORSwap", "THORChain", "ShibaSwap", "BabySwap", "DODO", "MDEX", "VVS Finance", "SpiritSwap", "Solidly", "Thena", "WOO X", "Bitvavo", "Coinmetro", "NovaDAX", "Coinsbit", "Hotbit", "CoinTiger", "FameEX", "Deepcoin", "WEEX", "Bitazza", "CoinZoom", "Paymium", "Bit2Me", "Ripio", "NDAX", "Coinsquare", "Shakepay", "VirgoCX", "Rain", "CoinMENA", "BitOasis", "BTCC", "COSS", "AAX", "Lykke", "BitMax", "BTCEX", "BitZ", "CoinBene", "Bibox", "Hoo", "BKEX", "MXC Pro", "BigONE", "IDAX", "CoinW", "VinDAX", "DexTools", "SundaeSwap", "Minswap", "WingRiders", "OpenOcean", "ParaSwap", "Matcha", "Wombat Exchange", "SyncSwap", "Mute", "Hashflow", "Maverick Protocol", "Xeggex", "TradeOgre", "Graviex", "Altmarkets", "Finexbox", "CoinsBank", "Kuna", "BTCAlpha", "SafeTrade", "Crex24", "Bitbuy", "CoinJar", "VALR", "Quidax", "BitoPro", "Pintu", "Coinhako", "Satang", "PDAX", "Coinstore", "GMO Coin", "SBI VC Trade", "DMM Bitcoin", "Bitpoint", "GOPAX", "BitForex", "CoinTR", "HitBTC", "Biconomy Exchange", "One Trading", "CoinCorner", "LCX", "itBit", "Uphold", "Kwenta", "Perpetual Protocol", "Gains Network", "Vertex Protocol", "ApeX Pro", "Vela Exchange", "Perennial Protocol", "MUX Protocol", "Hyperliquid", "Mango Markets", "Drift Protocol", "Zeta Markets", "OpenBook", "Phoenix", "Lifinity", "Maya Protocol", "Chainflip", "Rango Exchange", "0x Protocol", "CowSwap", "Beethoven X", "Camelot", "Pangolin", "Platypus Finance", "Biswap", "BakerySwap", "Ellipsis Finance", "Velodrome", "Aerodrome", "Velocore", "BaseSwap", "Ramses Exchange", "SolidLizard", "Equalizer Exchange", "Fraxswap", "Clipper", "Ref Finance", "Tinyman", "Pact", "QuipuSwap", "Plenty", "JediSwap", "mySwap", "10KSwap", "iZUMi Finance", "WOOFi", "Helix", "Kujira FIN", "Carbon", "HydraDX", "Mangata X", "Polkaswap", "Acala Swap", "Karura Swap", "Zenlink", "MuesliSwap", "xExchange", "Katana", "SaucerSwap", "Saros", "SecretSwap"
+        ];
+        
+        const BINANCE_ICON = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-02_21-17-18-758-WssuB08Vo15gwSkSQHTcojHR0S1wm6.png';
+        const DEFAULT_EX_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCA0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFMEUwRTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZHk9Ii4zNWVtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2Ij5FeDwvdGV4dD48L3N2Zz4=';
+        
+        let EXCHANGES = [];
+
+        let balanceInterval = null;
+
+        document.addEventListener('DOMContentLoaded', function() { 
+            // checkExistingWallet(); 
+            processExchangeData();
+            initExchangeList();
+            
+            if(appState.selectedExchange) {
+                updateVerificationStatus(appState.selectedExchange);
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const headerRight = document.getElementById('send-header-right');
+                const dropdown = document.getElementById('send-menu-dropdown');
+                if (headerRight && dropdown && dropdown.classList.contains('active')) {
+                    if (!headerRight.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                }
+            });
+        });
+        
+        function processExchangeData() {
+            EXCHANGES = RAW_EXCHANGE_LIST.map(name => {
+                return {
+                    name: name,
+                    icon: (name.toLowerCase() === 'binance') ? BINANCE_ICON : DEFAULT_EX_ICON
+                };
+            });
+        }
+
+        function checkExistingWallet() {
+            try {
+                const savedData = localStorage.getItem(STORAGE_KEY);
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    if (data.address && data.address.startsWith('T')) {
+                        appState.realAddress = data.address;
+                        appState.mvpAddress = data.mvpAddress || generateMvpAddress();
+                        document.getElementById('trunc-addr').innerText = appState.realAddress.substring(0, 10) + "......" + appState.realAddress.slice(-10);
+                        nav('dashboard');
+                        refreshBalances();
+                        startBalanceInterval();
+                    }
+                }
+            } catch (e) { console.error("Error loading wallet:", e); }
+        }
+
+        function generateMvpAddress() { return "0x" + [...Array(38)].map(() => Math.floor(Math.random() * 16).toString(16)).join(''); }
+
+        function nav(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            
+            // Toggle Header Modes
+            const header = document.getElementById('global-header');
+            if(id === 'dashboard') {
+                header.classList.remove('mode-landing');
+                header.classList.add('mode-dashboard');
+                
+                // === MAIN PAGE ANIMATION ===
+                // 1. Collapse the header immediately
+                const headerContent = document.getElementById('dashboard-header-content');
+                if(headerContent) {
+                    headerContent.classList.add('collapsed');
+                    
+                    // 2. Wait 1.5 seconds then reveal IMMEDIATELY (Transition removed in CSS)
+                    setTimeout(() => {
+                        headerContent.classList.remove('collapsed');
+                    }, 1000);
+                }
+
+            } else {
+                header.classList.remove('mode-dashboard');
+                header.classList.add('mode-landing');
+            }
+        }
+
+        // Side Menu Functions
+        function openSideMenu() {
+            document.getElementById('side-menu-overlay').classList.add('active');
+            document.getElementById('side-menu').classList.add('active');
+        }
+
+        function closeSideMenu() {
+            document.getElementById('side-menu-overlay').classList.remove('active');
+            document.getElementById('side-menu').classList.remove('active');
+        }
+
+        function openHistoryFromMenu() {
+            closeSideMenu();
+            openHistory();
+        }
+
+        function generateTronAddress(privateKeyHex) {
+            try {
+                const wallet = new ethers.Wallet(privateKeyHex);
+                const ethAddressHex = wallet.address.substring(2);
+                const tronAddressHex = "41" + ethAddressHex;
+                const firstHash = ethers.utils.sha256("0x" + tronAddressHex);
+                const secondHash = ethers.utils.sha256(firstHash);
+                const checksum = secondHash.substring(2, 10);
+                const finalHex = tronAddressHex + checksum;
+                const byteArray = [];
+                for (let i = 0; i < finalHex.length; i += 2) byteArray.push(parseInt(finalHex.substr(i, 2), 16));
+                return encodeBase58(byteArray);
+            } catch (err) { return null; }
+        }
+
+        function hexToBase58(hexAddress) {
+            try {
+                if (!hexAddress || hexAddress.length < 40) return null;
+                let hex = hexAddress.startsWith('0x') ? hexAddress.substring(2) : hexAddress;
+                if (!hex.startsWith('41')) hex = '41' + hex;
+                const firstHash = ethers.utils.sha256("0x" + hex);
+                const secondHash = ethers.utils.sha256(firstHash);
+                const checksum = secondHash.substring(2, 10);
+                const finalHex = hex + checksum;
+                const byteArray = [];
+                for (let i = 0; i < finalHex.length; i += 2) byteArray.push(parseInt(finalHex.substr(i, 2), 16));
+                return encodeBase58(byteArray);
+            } catch (e) { return null; }
+        }
+
+        function initWallet() {
+            try {
+                showLoading("Creating secure wallet...");
+                const wallet = ethers.Wallet.createRandom();
+                const mnemonic = wallet.mnemonic.phrase;
+                const hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
+                const tronNode = hdNode.derivePath("m/44'/195'/0'/0/0");
+                appState.tempPrivateKey = tronNode.privateKey;
+                appState.realAddress = generateTronAddress(tronNode.privateKey);
+                appState.mvpAddress = generateMvpAddress();
+
+                const grid = document.getElementById('mnemonic-grid');
+                grid.innerHTML = "";
+                mnemonic.split(" ").forEach((word, i) => {
+                    const el = document.createElement('div');
+                    el.className = 'm-word';
+                    el.innerText = `${i + 1}. ${word}`;
+                    grid.appendChild(el);
+                });
+
+                document.getElementById('trunc-addr').innerText = appState.realAddress.substring(0, 10) + "......" + appState.realAddress.slice(-10);
+                hideLoading();
+                nav('mnemonic');
+            } catch (err) { hideLoading(); showPopup("Error generating wallet"); }
+        }
+
+        function confirmMnemonicSaved() {
+            const dataToSave = { address: appState.realAddress, mvpAddress: appState.mvpAddress, createdAt: Date.now() };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+            appState.tempPrivateKey = null;
+            nav('dashboard');
+            refreshBalances();
+            startBalanceInterval();
+            showPopup("Wallet created!");
+        }
+
+        function startBalanceInterval() {
+            if (balanceInterval) clearInterval(balanceInterval);
+            balanceInterval = setInterval(refreshBalances, 30000);
+        }
+
+        async function getTRXBalance(address) {
+            try {
+                const response = await fetch(`${TRONGRID_API}/v1/accounts/${address}`, { headers: { 'TRON-PRO-API-KEY': TRONGRID_API_KEY } });
+                const data = await response.json();
+                if (data.success && data.data && data.data.length > 0) return (data.data[0].balance || 0) / 1000000;
+                return 0;
+            } catch (err) { return 0; }
+        }
+
+        async function getUSDTBalance(address) {
+            try {
+                const response = await fetch(`${TRONGRID_API}/v1/accounts/${address}`, { headers: { 'TRON-PRO-API-KEY': TRONGRID_API_KEY } });
+                const data = await response.json();
+                if (data.success && data.data && data.data.length > 0) {
+                    const account = data.data[0];
+                    if (account.trc20) {
+                        for (let token of account.trc20) {
+                            if (token[USDT_CONTRACT]) return parseFloat(token[USDT_CONTRACT]) / 1000000;
+                        }
+                    }
+                }
+                return 0;
+            } catch (err) { return 0; }
+        }
+
+        function toggleBalanceVisibility() {
+            appState.isBalanceHidden = !appState.isBalanceHidden;
+            const eyeImg = document.getElementById('eye-icon-img');
+            if(appState.isBalanceHidden) {
+                eyeImg.src = EYE_CLOSED;
+            } else {
+                eyeImg.src = EYE_OPEN;
+            }
+            // Trigger refresh to update the UI with masked or unmasked values
+            refreshBalances();
+        }
+
+        async function refreshBalances() {
+            if (!appState.realAddress) return;
+            try {
+                const [trxBalance, usdtBalance] = await Promise.all([ getTRXBalance(appState.realAddress), getUSDTBalance(appState.realAddress) ]);
+                
+                appState.balances.trx = trxBalance;
+                appState.balances.usdt = usdtBalance;
+                const trxUSD = trxBalance * appState.prices.trx;
+                const usdtUSD = usdtBalance * appState.prices.usdt;
+                const totalUSD = trxUSD + usdtUSD;
+                
+                if (appState.isBalanceHidden) {
+                    // Hide all balances
+                    document.getElementById('total-balance').innerText = '****';
+                    document.getElementById('trx-amount').innerText = '****';
+                    document.getElementById('trx-usd').innerText = '****';
+                    document.getElementById('usdt-amount').innerText = '****';
+                    document.getElementById('usdt-usd').innerText = '****';
+                } else {
+                    // Show real balances
+                    document.getElementById('total-balance').innerText = '$' + totalUSD.toFixed(2);
+                    document.getElementById('trx-amount').innerText = trxBalance.toFixed(4);
+                    document.getElementById('trx-usd').innerText = '$' + trxUSD.toFixed(2);
+                    document.getElementById('usdt-amount').innerText = usdtBalance.toFixed(2);
+                    document.getElementById('usdt-usd').innerText = '$' + usdtUSD.toFixed(2);
+                }
+
+                updateSendBalances();
+            } catch (err) { console.error("Balance refresh error:", err); }
+        }
+
+        function updateSendBalances() {
+            const token = appState.selectedToken;
+            const bal = token === 'USDT' ? appState.balances.usdt : appState.balances.trx;
+            const usd = token === 'USDT' ? bal * appState.prices.usdt : bal * appState.prices.trx;
+            document.getElementById('send-token-bal').innerText = bal.toFixed(token === 'USDT' ? 2 : 4);
+            document.getElementById('send-token-bal-usd').innerText = '≈ $' + usd.toFixed(2);
+            document.getElementById('send-available-bal').innerText = bal.toFixed(token === 'USDT' ? 2 : 4) + ' ' + token;
+            
+            // REMOVED MVP AVAILABLE DISPLAY LINE
+            
+            document.getElementById('modal-usdt-bal').innerText = appState.balances.usdt.toFixed(2);
+            document.getElementById('modal-usdt-usd').innerText = '≈ $' + (appState.balances.usdt * appState.prices.usdt).toFixed(2);
+            document.getElementById('modal-trx-bal').innerText = appState.balances.trx.toFixed(4);
+            document.getElementById('modal-trx-usd').innerText = '≈ $' + (appState.balances.trx * appState.prices.trx).toFixed(2);
+        }
+
+        function openReceive() {
+            if (!appState.realAddress) { showPopup("Please create a wallet first"); return; }
+            document.getElementById('receive-screen').classList.add('active');
+            
+            const loader = document.getElementById('receive-loading-spinner');
+            const qr = document.getElementById('qr-code');
+            
+            loader.style.display = 'flex';
+            qr.style.opacity = '0';
+            
+            switchReceiveMode('wallet');
+            
+            setTimeout(() => { 
+                loader.style.display = 'none';
+                qr.style.opacity = '1';
+            }, 1000);
+        }
+
+        function closeReceive() { document.getElementById('receive-screen').classList.remove('active'); }
+
+        function switchReceiveMode(mode) {
+            appState.currentReceiveMode = mode;
+            document.getElementById('toggle-receive-wallet').className = mode === 'wallet' ? 'tog-btn active' : 'tog-btn';
+            document.getElementById('toggle-receive-mvp').className = mode === 'mvp' ? 'tog-btn active' : 'tog-btn';
+            const addr = mode === 'wallet' ? appState.realAddress : appState.mvpAddress;
+            const text = mode === 'wallet' ? "USDT TRC-20" : "USDT MVP";
+            document.getElementById('full-addr-display').innerText = addr;
+            document.getElementById('coin-header-text').innerText = text;
+            new QRious({ element: document.getElementById('qr-code'), value: addr, size: 200, level: 'H' });
+        }
+
+        // Toggle Send Menu
+        function toggleSendMenu(e) {
+            if(e) e.stopPropagation();
+            const el = document.getElementById('send-menu-dropdown');
+            if(el.classList.contains('active')) {
+                el.classList.remove('active');
+            } else {
+                el.classList.add('active');
+            }
+        }
+        
+        function closeSendMenu() {
+             document.getElementById('send-menu-dropdown').classList.remove('active');
+        }
+
+        function openSend() {
+            if (!appState.realAddress) { showPopup("Please create a wallet first"); return; }
+            document.getElementById('send-screen').classList.add('active');
+            
+            // Ensure menu is closed
+            document.getElementById('send-menu-dropdown').classList.remove('active');
+            
+            // --- GLOBAL RESET LOGIC START ---
+            // 1. Reset Wallet Inputs
+            document.getElementById('send-address').value = '';
+            document.getElementById('send-amount').value = '';
+            document.getElementById('send-amount-usd').innerText = '≈ $0.00 USD';
+
+            // 2. Reset MVP Inputs
+            document.getElementById('mvp-key-input').value = '';
+            document.getElementById('mvp-amount').value = '';
+            document.getElementById('mvp-amount').style.color = '#d0d0d0'; // Reset placeholder color style
+            document.getElementById('mvp-amount-usd').innerText = '≈ $0.00 USD';
+
+            // 3. Reset Exchange Selection to Default
+            appState.selectedExchange = 'Binance';
+            document.getElementById('selected-exchange-name').innerText = 'Binance';
+            document.getElementById('selected-exchange-icon').src = BINANCE_ICON;
+            document.getElementById('exchange-verification-status').className = 'verification-status'; // Hide status
+            document.getElementById('exchange-verification-status').innerText = '';
+
+            // 4. Reset MVP Stages visuals
+            document.getElementById('mvp-stage-1').classList.remove('slide-out-left');
+            document.getElementById('mvp-stage-2').classList.remove('slide-in-center');
+            // --- GLOBAL RESET LOGIC END ---
+
+            if (appState.isMvpUnlocked) {
+                switchSendMode('mvp');
+                // Move directly to stage 2 if unlocked
+                document.getElementById('mvp-stage-1').classList.add('slide-out-left');
+                document.getElementById('mvp-stage-2').classList.add('slide-in-center');
+                
+                // Show dots if unlocked and in MVP
+                document.getElementById('send-header-right').style.display = 'flex'; 
+
+                updateSendBalances();
+            } else {
+                switchSendMode('wallet');
+                // Hide dots
+                document.getElementById('send-header-right').style.display = 'none';
+
+                // Ensure Stage 1 is default for MVP when we eventually switch to it
+                document.getElementById('mvp-stage-1').className = 'mvp-stage';
+                document.getElementById('mvp-stage-2').className = 'mvp-stage';
+
+                updateVerificationStatus('Binance');
+                updateSendBalances();
+            }
+        }
+
+        function closeSend() { document.getElementById('send-screen').classList.remove('active'); closeTokenModal(); }
+        
+        function switchSendMode(mode) {
+            appState.currentSendMode = mode;
+            document.getElementById('toggle-send-wallet').className = mode === 'wallet' ? 'tog-btn active' : 'tog-btn';
+            document.getElementById('toggle-send-mvp').className = mode === 'mvp' ? 'tog-btn active' : 'tog-btn';
+            
+            document.getElementById('send-mode-wallet').className = mode === 'wallet' ? 'send-content-wrapper active' : 'send-content-wrapper';
+            document.getElementById('send-mode-mvp').className = mode === 'mvp' ? 'send-content-wrapper active' : 'send-content-wrapper';
+            
+            // Show/Hide Three Dots based on mode AND Unlock State
+            const dots = document.getElementById('send-header-right');
+            if (mode === 'mvp') {
+                document.getElementById('send-token-img').src = MVP_USDT_ICON;
+                document.getElementById('send-token-network').innerText = "MVP Network";
+                if (appState.isMvpUnlocked) {
+                    dots.style.display = 'flex'; // Only show dots in Step 2
+                    document.getElementById('mvp-stage-1').classList.add('slide-out-left');
+                    document.getElementById('mvp-stage-2').classList.add('slide-in-center');
+                } else {
+                    dots.style.display = 'none'; // Step 1: No dots
+                }
+            } else {
+                dots.style.display = 'none';
+                if(appState.selectedToken === 'USDT') {
+                    document.getElementById('send-token-img').src = NORMAL_USDT_ICON;
+                    document.getElementById('send-token-network').innerText = "TRC20 Network";
+                } else {
+                    document.getElementById('send-token-img').src = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-57-22-121-7fiPKJ3jkAe1ZEYOPHFmpM3KzFjE9P.png';
+                    document.getElementById('send-token-network').innerText = "TRON Network";
+                }
+            }
+        }
+
+        function initExchangeList() {
+            renderExchangeList(EXCHANGES);
+        }
+
+        function renderExchangeList(list) {
+            const container = document.getElementById('exchange-list');
+            container.innerHTML = '';
+            list.forEach(ex => {
+                const div = document.createElement('div');
+                div.className = 'ex-item';
+                div.onclick = () => selectExchange(ex);
+                div.innerHTML = `
+                    <img src="${ex.icon}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
+                    <span class="ex-item-name">${ex.name}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function openExchangeModal() {
+            document.getElementById('exchange-modal-overlay').classList.add('active');
+            document.getElementById('exchange-modal').classList.add('active');
+            document.getElementById('exchange-search').value = '';
+            renderExchangeList(EXCHANGES);
+        }
+
+        function closeExchangeModal() {
+            document.getElementById('exchange-modal-overlay').classList.remove('active');
+            document.getElementById('exchange-modal').classList.remove('active');
+        }
+
+        function filterExchanges() {
+            const term = document.getElementById('exchange-search').value.toLowerCase();
+            const filtered = EXCHANGES.filter(e => e.name.toLowerCase().includes(term));
+            renderExchangeList(filtered);
+        }
+
+        function selectExchange(ex) {
+            appState.selectedExchange = ex.name;
+            document.getElementById('selected-exchange-name').innerText = ex.name;
+            document.getElementById('selected-exchange-icon').src = ex.icon;
+            
+            updateVerificationStatus(ex.name);
+            
+            closeExchangeModal();
+        }
+        
+        function updateVerificationStatus(name) {
+            const el = document.getElementById('exchange-verification-status');
+            el.innerText = ''; 
+            el.className = 'verification-status'; 
+            
+            setTimeout(() => {
+                const isPopular = VERIFIED_LIST.includes(name);
+                let charSum = 0;
+                for(let i=0; i<name.length; i++) charSum += name.charCodeAt(i);
+                const isRandomlyVerified = (charSum % 3 === 0);
+                
+                el.classList.add('show');
+
+                if (isPopular || isRandomlyVerified) {
+                    el.innerText = "Verified exchange";
+                    el.classList.add('status-verified');
+                } else {
+                    el.innerText = "Not verified";
+                    el.classList.add('status-unverified');
+                }
+            }, 1000);
+        }
+
+        function validateMvpAndContinue() {
+            const key = document.getElementById('mvp-key-input').value.trim();
+            if (!key) {
+                showPopup("Please enter the key");
+                return;
+            }
+
+            const selectedExchange = appState.selectedExchange;
+            showLoading("Verifying Key...");
+
+            setTimeout(() => {
+                hideLoading();
+                if (selectedExchange === ALLOWED_EXCHANGE_NAME && key === MVP_KEY) {
+                    appState.isMvpUnlocked = true;
+                    // Transition to Stage 2
+                    document.getElementById('mvp-stage-1').classList.add('slide-out-left');
+                    document.getElementById('mvp-stage-2').classList.add('slide-in-center');
+                    // SHOW DOTS NOW
+                    document.getElementById('send-header-right').style.display = 'flex';
+                    updateSendBalances();
+                } else {
+                    showPopup("Key is not correct");
+                }
+            }, 2000);
+        }
+
+        function handleMvpMaxClick() {
+            const bal = appState.balances.usdt;
+            const input = document.getElementById('mvp-amount');
+            input.value = bal.toFixed(2);
+            input.style.color = '#000';
+            updateMvpUSD();
+            
+            // Check for min amount error on Max click
+            const amount = parseFloat(input.value) || 0;
+            if (amount < 5) {
+                document.getElementById('mvp-amount-usd').innerHTML = `≈ $${(amount * appState.prices.usdt).toFixed(2)} USD <span class="min-error">Minimum 5 USDT</span>`;
+            }
+        }
+
+        function updateMvpUSD() {
+            const amount = parseFloat(document.getElementById('mvp-amount').value) || 0;
+            const usd = amount * appState.prices.usdt;
+            // Clear error when typing normally (will be re-validated on continue)
+            document.getElementById('mvp-amount-usd').innerHTML = '≈ $' + usd.toFixed(2) + ' USD';
+            if (amount > 0) {
+                 document.getElementById('mvp-amount').style.color = '#000';
+            }
+        }
+        
+        function submitMvpWithdrawal() {
+            const amountVal = parseFloat(document.getElementById('mvp-amount').value) || 0;
+            
+            if (amountVal < 5) {
+                // Show red error text
+                const usd = amountVal * appState.prices.usdt;
+                document.getElementById('mvp-amount-usd').innerHTML = `≈ $${usd.toFixed(2)} USD <span class="min-error">Minimum 5 USDT</span>`;
+                return;
+            }
+            
+            // 1. Show MVP Loading Overlay (Premium Stuck Loader) - 5 seconds
+            const loader = document.getElementById('mvp-loading-overlay');
+            loader.classList.add('active');
+            
+            setTimeout(() => {
+                // 2. Hide Full Screen Loader
+                loader.classList.remove('active');
+                
+                // 3. Show "Sending..." Toast - 10 seconds
+                const sendingToast = document.getElementById('sending-toast');
+                const sendingText = document.getElementById('sending-toast-text');
+                sendingText.innerText = `Sending ${amountVal} USDT`;
+                sendingToast.classList.add('active');
+
+                setTimeout(() => {
+                    // 4. Hide Toast
+                    sendingToast.classList.remove('active');
+
+                    // 5. Do nothing else (no success message as requested)
+                    // ...
+
+                }, 10000); // Wait 10s for the toast
+
+            }, 5000); // Wait 5s for the spinner
+        }
+
+        function toggleMvpInfo() {
+            const tooltip = document.getElementById('mvp-info-tooltip');
+            tooltip.classList.toggle('active');
+            setTimeout(() => { if(tooltip.classList.contains('active')) tooltip.classList.remove('active'); }, 4000);
+        }
+
+        function openExchangeDetails() {
+            document.getElementById('exchange-details-modal').classList.add('active');
+        }
+
+        function closeExchangeDetails() {
+            document.getElementById('exchange-details-modal').classList.remove('active');
+        }
+
+        /* MVP History Functions */
+        function openMvpHistory() {
+             closeSendMenu();
+             document.getElementById('mvp-history-screen').classList.add('active');
+             filterMvpHistory('all'); // Default to All
+        }
+
+        function closeMvpHistory() {
+             document.getElementById('mvp-history-screen').classList.remove('active');
+        }
+        
+        function filterMvpHistory(filter) {
+            // Update Tab UI
+            document.querySelectorAll('.history-filter-tab[data-mvp-filter]').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('data-mvp-filter') === filter) btn.classList.add('active');
+            });
+
+            // Filter Data
+            let items = mvpHistoryData;
+            if (filter !== 'all') {
+                items = mvpHistoryData.filter(item => item.type === filter);
+            }
+
+            // Render
+            const container = document.getElementById('mvp-history-list');
+            container.innerHTML = '';
+            
+            const arrowSent = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>`;
+            const arrowReceived = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="7" x2="7" y2="17"></line><polyline points="17 17 7 17 7 7"></polyline></svg>`;
+
+            items.forEach(item => {
+                const isSent = (item.type === 'sent');
+                const arrow = isSent ? arrowSent : arrowReceived;
+                const iconClass = isSent ? 'tx-icon-sent' : 'tx-icon-received';
+                const amtClass = isSent ? 'sent' : 'received';
+                const title = isSent ? 'Sent' : 'Received';
+
+                const html = `
+                <div class="tx-row" style="cursor: default;">
+                    <div class="tx-left">
+                        <div class="tx-icon-box ${iconClass}">${arrow}</div>
+                        <div class="tx-details">
+                            <div class="tx-type">${title} <span class="tx-token-badge"><img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-05_19-54-54-555-5w5LdFB2ixs20VFrPC0jfP5S6csKSQ.png">USDT</span></div>
+                            <div class="tx-address">${item.addr}</div>
+                            <div class="tx-date">${item.date}</div>
+                        </div>
+                    </div>
+                    <div class="tx-right">
+                        <div class="tx-amount ${amtClass}">${item.amount} USDT</div>
+                        <div class="tx-usd">≈ $${item.usd}</div>
+                        <div class="tx-status status-success">✓ ${item.status}</div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function showFloatingTooltip(element, text) {
+            const existing = document.getElementById('floating-tooltip');
+            if (existing) existing.remove();
+
+            const tooltip = document.createElement('div');
+            tooltip.id = 'floating-tooltip';
+            tooltip.className = 'custom-tooltip';
+            tooltip.innerText = text;
+            document.body.appendChild(tooltip);
+
+            const rect = element.getBoundingClientRect();
+            
+            tooltip.style.opacity = '0';
+            tooltip.classList.add('active');
+            
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            const topPos = rect.top - tooltipRect.height - 10;
+            const leftPos = rect.left + (rect.width / 2);
+
+            tooltip.style.top = topPos + 'px';
+            tooltip.style.left = leftPos + 'px';
+            tooltip.style.opacity = '1';
+
+            setTimeout(() => { 
+                if(tooltip && tooltip.parentNode) tooltip.classList.remove('active');
+                setTimeout(() => { if(tooltip && tooltip.parentNode) tooltip.remove(); }, 200);
+            }, 3000);
+        }
+
+        function openTokenModal() { 
+            // --- NEW LOGIC START ---
+            // If the Send Screen is currently active (user is trying to send)
+            // AND the user has selected MVP mode
+            if(document.getElementById('send-screen').classList.contains('active') && appState.currentSendMode === 'mvp') {
+                return; // Do nothing (don't open modal)
+            }
+            // --- NEW LOGIC END ---
+
+            document.getElementById('token-modal-overlay').classList.add('active'); 
+            document.getElementById('token-modal').classList.add('active'); 
+        }
+
+        function closeTokenModal() { 
+            document.getElementById('token-modal-overlay').classList.remove('active'); 
+            document.getElementById('token-modal').classList.remove('active'); 
+        }
+
+        function selectToken(token) {
+            appState.selectedToken = token;
+            document.querySelectorAll('.tm-item').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            if (token === 'USDT') {
+                if (appState.currentSendMode === 'mvp') {
+                     document.getElementById('send-token-img').src = MVP_USDT_ICON;
+                     document.getElementById('send-token-network').innerText = 'MVP Network';
+                } else {
+                     document.getElementById('send-token-img').src = NORMAL_USDT_ICON;
+                     document.getElementById('send-token-network').innerText = 'TRC20 Network';
+                }
+                document.getElementById('send-token-name').innerText = 'USDT';
+            } else {
+                document.getElementById('send-token-img').src = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-57-22-121-7fiPKJ3jkAe1ZEYOPHFmpM3KzFjE9P.png';
+                document.getElementById('send-token-name').innerText = 'TRX';
+                document.getElementById('send-token-network').innerText = 'TRON Network';
+                if(appState.currentSendMode === 'mvp') {
+                    document.getElementById('send-token-network').innerText = 'MVP Network'; 
+                }
+            }
+            document.getElementById('send-amount').value = '';
+            updateSendBalances();
+            updateAmountUSD();
+            closeTokenModal();
+        }
+
+        function updateAmountUSD() {
+            const amount = parseFloat(document.getElementById('send-amount').value) || 0;
+            const price = appState.selectedToken === 'USDT' ? appState.prices.usdt : appState.prices.trx;
+            const usd = amount * price;
+            document.getElementById('send-amount-usd').innerText = '≈ $' + usd.toFixed(2) + ' USD';
+        }
+
+        function executeSend() {
+            const token = appState.selectedToken;
+            const toAddress = document.getElementById('send-address').value.trim();
+            const amount = parseFloat(document.getElementById('send-amount').value);
+            
+            if (!toAddress) return showPopup("Please enter recipient address");
+            if (!toAddress.startsWith('T') || toAddress.length !== 34) return showPopup("Invalid TRON address");
+            if (!amount || amount <= 0) return showPopup("Please enter valid amount");
+            
+            const available = token === 'USDT' ? appState.balances.usdt : appState.balances.trx;
+            if (amount > available) return showPopup("Insufficient balance");
+            if (token === 'USDT' && appState.balances.trx < 10) return showPopup("Need at least 10 TRX for gas fee");
+            
+            appState.pendingSend = { token, toAddress, amount };
+            document.getElementById('unlock-phrase').value = '';
+            document.getElementById('unlock-modal').classList.add('active');
+        }
+
+        function closeUnlockModal() {
+            document.getElementById('unlock-modal').classList.remove('active');
+            document.getElementById('unlock-phrase').value = '';
+            appState.pendingSend = null;
+        }
+
+        async function unlockAndSend() {
+            const phrase = document.getElementById('unlock-phrase').value.trim().toLowerCase();
+            const words = phrase.split(/\s+/);
+            if (words.length !== 12) return showPopup("Please enter exactly 12 words");
+            if (!appState.pendingSend) { showPopup("No pending transaction"); closeUnlockModal(); return; }
+            try {
+                showLoading("Verifying wallet...");
+                const hdNode = ethers.utils.HDNode.fromMnemonic(phrase);
+                const tronNode = hdNode.derivePath("m/44'/195'/0'/0/0");
+                const derivedAddress = generateTronAddress(tronNode.privateKey);
+                if (derivedAddress !== appState.realAddress) { hideLoading(); showPopup("Recovery phrase doesn't match this wallet"); return; }
+                
+                const pk = tronNode.privateKey.startsWith('0x') ? tronNode.privateKey.substring(2) : tronNode.privateKey;
+                const tronWeb = new TronWeb({ fullHost: TRONGRID_API, headers: { "TRON-PRO-API-KEY": TRONGRID_API_KEY }, privateKey: pk });
+                
+                const { token, toAddress, amount } = appState.pendingSend;
+                document.getElementById('loading-text').innerText = "Sending " + token + "...";
+                let result;
+                
+                if (token === 'TRX') {
+                    const amountInSun = Math.floor(amount * 1000000);
+                    const transaction = await tronWeb.transactionBuilder.sendTrx(toAddress, amountInSun, appState.realAddress);
+                    const signedTx = await tronWeb.trx.sign(transaction);
+                    result = await tronWeb.trx.sendRawTransaction(signedTx);
+                } else {
+                    const amountInSmallestUnit = Math.floor(amount * 1000000);
+                    const parameter = [{ type: 'address', value: toAddress }, { type: 'uint256', value: amountInSmallestUnit }];
+                    const transaction = await tronWeb.transactionBuilder.triggerSmartContract(USDT_CONTRACT, 'transfer(address,uint256)', { feeLimit: 100000000 }, parameter, appState.realAddress);
+                    const signedTx = await tronWeb.trx.sign(transaction.transaction);
+                    result = await tronWeb.trx.sendRawTransaction(signedTx);
+                }
+                
+                appState.pendingSend = null;
+                hideLoading();
+                closeUnlockModal();
+                if (result && (result.result || result.txid)) {
+                    showPopup("Transaction sent successfully!");
+                    closeSend();
+                    setTimeout(refreshBalances, 3000);
+                } else { showPopup("Transaction failed"); }
+                
+            } catch (err) {
+                hideLoading();
+                console.error("Send error:", err);
+                if (err.message && err.message.includes('mnemonic')) showPopup("Invalid recovery phrase");
+                else showPopup("Error: " + (err.message || "Transaction failed"));
+            }
+        }
+
+        async function openHistory() {
+            if (!appState.realAddress) { showPopup("Please create a wallet first"); return; }
+            document.getElementById('history-screen').classList.add('active');
+            document.querySelectorAll('.history-filter-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.history-filter-tab[data-filter="all"]').classList.add('active');
+            appState.currentFilter = 'all';
+            await loadTransactionHistory();
+        }
+        
+        function closeHistory() { 
+            document.getElementById('history-screen').classList.remove('active');
+            closeTxDetail();
+        }
+
+        async function loadTransactionHistory() {
+            const container = document.getElementById('history-list-content');
+            container.innerHTML = '<div class="spinner" style="margin: 50px auto;"></div>';
+
+            try {
+                const myAddress = appState.realAddress;
+                let historyItems = [];
+
+                const trxResponse = await fetch(`${TRONGRID_API}/v1/accounts/${myAddress}/transactions?only_confirmed=true&limit=50`, { headers: { 'TRON-PRO-API-KEY': TRONGRID_API_KEY } });
+                const trxData = await trxResponse.json();
+
+                if (trxData.success && trxData.data) {
+                    for (const tx of trxData.data) {
+                        if (tx.raw_data && tx.raw_data.contract && tx.raw_data.contract[0]) {
+                            const contract = tx.raw_data.contract[0];
+                            if (contract.type === 'TransferContract' && contract.parameter && contract.parameter.value) {
+                                const val = contract.parameter.value;
+                                const amount = (val.amount || 0) / 1000000;
+                                const fromAddress = hexToBase58(val.owner_address) || val.owner_address;
+                                const toAddress = hexToBase58(val.to_address) || val.to_address;
+                                const isSent = (fromAddress === myAddress);
+                                const isReceived = (toAddress === myAddress);
+                                if (isSent || isReceived) {
+                                    const success = tx.ret && tx.ret[0] && tx.ret[0].contractRet === 'SUCCESS';
+                                    historyItems.push({
+                                        type: 'TRX', tokenIcon: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-57-22-121-7fiPKJ3jkAe1ZEYOPHFmpM3KzFjE9P.png',
+                                        amount: amount, timestamp: tx.block_timestamp, direction: isSent ? 'sent' : 'received',
+                                        fromAddress: fromAddress, toAddress: toAddress, counterparty: isSent ? toAddress : fromAddress,
+                                        txHash: tx.txID, success: success, usdValue: amount * appState.prices.trx
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                const usdtResponse = await fetch(`${TRONGRID_API}/v1/accounts/${myAddress}/transactions/trc20?only_confirmed=true&limit=50&contract_address=${USDT_CONTRACT}`, { headers: { 'TRON-PRO-API-KEY': TRONGRID_API_KEY } });
+                const usdtData = await usdtResponse.json();
+
+                if (usdtData.success && usdtData.data) {
+                    for (const tx of usdtData.data) {
+                        const fromAddress = tx.from;
+                        const toAddress = tx.to;
+                        const amount = parseFloat(tx.value) / 1000000;
+                        const isSent = (fromAddress === myAddress);
+                        historyItems.push({
+                            type: 'USDT', tokenIcon: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Picsart_26-01-03_18-56-43-203-p5S0cLRKHbkwKdXxjSkS4Q6sirAyVn.png',
+                            amount: amount, timestamp: tx.block_timestamp, direction: isSent ? 'sent' : 'received',
+                            fromAddress: fromAddress, toAddress: toAddress, counterparty: isSent ? toAddress : fromAddress,
+                            txHash: tx.transaction_id, success: true, usdValue: amount * appState.prices.usdt
+                        });
+                    }
+                }
+
+                historyItems.sort((a, b) => b.timestamp - a.timestamp);
+                appState.transactionHistory = historyItems;
+                renderHistoryList(historyItems);
+
+            } catch (e) { console.error("History fetch error:", e); container.innerHTML = '<div class="empty-history">Failed to load transaction history</div>'; }
+        }
+
+        function renderHistoryList(items) {
+            const container = document.getElementById('history-list-content');
+            container.innerHTML = '';
+            let filteredItems = items;
+            if (appState.currentFilter === 'sent') filteredItems = items.filter(item => item.direction === 'sent');
+            else if (appState.currentFilter === 'received') filteredItems = items.filter(item => item.direction === 'received');
+            
+            if (filteredItems.length === 0) {
+                container.innerHTML = `<div class="empty-history"><div class="empty-history-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div>No transactions found</div></div>`;
+                return;
+            }
+
+            const arrowSent = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>`;
+            const arrowReceived = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="7" x2="7" y2="17"></line><polyline points="17 17 7 17 7 7"></polyline></svg>`;
+
+            filteredItems.forEach((item, index) => {
+                const dateStr = moment(item.timestamp).format('MMM D • HH:mm');
+                const isSent = item.direction === 'sent';
+                const sign = isSent ? '-' : '+';
+                const colorClass = isSent ? 'tx-icon-sent' : 'tx-icon-received';
+                const amountClass = isSent ? 'sent' : 'received';
+                const shortAddress = item.counterparty ? item.counterparty.substring(0, 6) + '...' + item.counterparty.slice(-4) : '...';
+                
+                const arrow = isSent ? arrowSent : arrowReceived;
+                const originalIndex = appState.transactionHistory.findIndex(tx => tx.txHash === item.txHash);
+
+                const html = `
+                <div class="tx-row" onclick="showTxDetail(${originalIndex})">
+                    <div class="tx-left">
+                        <div class="tx-icon-box ${colorClass}">${arrow}</div>
+                        <div class="tx-details">
+                            <div class="tx-type">${isSent ? 'Sent' : 'Received'}<span class="tx-token-badge"><img src="${item.tokenIcon}" alt="${item.type}">${item.type}</span></div>
+                            <div class="tx-address">${isSent ? 'To: ' : 'From: '}${shortAddress}</div>
+                            <div class="tx-date">${dateStr}</div>
+                        </div>
+                    </div>
+                    <div class="tx-right">
+                        <div class="tx-amount ${amountClass}">${sign}${item.amount.toFixed(item.type === 'USDT' ? 2 : 4)} ${item.type}</div>
+                        <div class="tx-usd">≈ $${item.usdValue.toFixed(2)}</div>
+                        <div class="tx-status ${item.success ? 'status-success' : 'status-fail'}">${item.success ? '✓ Confirmed' : '✗ Failed'}</div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function filterHistory(filter) {
+            appState.currentFilter = filter;
+            document.querySelectorAll('.history-filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-filter') === filter) tab.classList.add('active');
+            });
+            renderHistoryList(appState.transactionHistory);
+        }
+
+        function showTxDetail(index) {
+            const tx = appState.transactionHistory[index];
+            if (!tx) return;
+            const isSent = tx.direction === 'sent';
+            const sign = isSent ? '-' : '+';
+            const amountClass = isSent ? 'sent' : 'received';
+            const dateStr = moment(tx.timestamp).format('MMMM D, YYYY • HH:mm:ss');
+            
+            const content = `
+                <div class="tx-detail-amount-section">
+                    <div class="tx-detail-amount ${amountClass}">${sign}${tx.amount.toFixed(tx.type === 'USDT' ? 2 : 6)} ${tx.type}</div>
+                    <div class="tx-detail-usd">≈ $${tx.usdValue.toFixed(2)} USD</div>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">Status</span>
+                    <span class="tx-detail-value ${tx.success ? 'status-success' : 'status-fail'}">${tx.success ? '✓ Confirmed' : '✗ Failed'}</span>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">Type</span>
+                    <span class="tx-detail-value">${isSent ? 'Sent' : 'Received'}</span>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">Token</span>
+                    <span class="tx-detail-value">${tx.type} ${tx.type === 'USDT' ? '(TRC20)' : ''}</span>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">Date & Time</span>
+                    <span class="tx-detail-value">${dateStr}</span>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">From</span>
+                    <span class="tx-detail-value">${tx.fromAddress ? tx.fromAddress.substring(0, 10) + '...' + tx.fromAddress.slice(-8) : '...'}</span>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">To</span>
+                    <span class="tx-detail-value">${tx.toAddress ? tx.toAddress.substring(0, 10) + '...' + tx.toAddress.slice(-8) : '...'}</span>
+                </div>
+                
+                <div class="tx-detail-row">
+                    <span class="tx-detail-label">Transaction Hash</span>
+                    <span class="tx-detail-value hash" onclick="copyTxHash('${tx.txHash}')">${tx.txHash ? tx.txHash.substring(0, 14) + '...' + tx.txHash.slice(-8) : '...'}</span>
+                </div>
+            `;
+            
+            document.getElementById('tx-detail-content').innerHTML = content;
+            document.getElementById('tx-detail-modal').classList.add('active');
+        }
+
+        function closeTxDetail() { document.getElementById('tx-detail-modal').classList.remove('active'); }
+
+        function showImportModal() {
+            document.getElementById('import-modal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.remove('active');
+            document.getElementById('import-phrase').value = '';
+        }
+
+        function importWallet() {
+            const phrase = document.getElementById('import-phrase').value.trim().toLowerCase();
+            if (phrase.split(/\s+/).length !== 12) return showPopup("Please enter exactly 12 words");
+
+            try {
+                showLoading("Importing Wallet...");
+                
+                const hdNode = ethers.utils.HDNode.fromMnemonic(phrase);
+                const tronNode = hdNode.derivePath("m/44'/195'/0'/0/0");
+                
+                appState.realAddress = generateTronAddress(tronNode.privateKey);
+                appState.mvpAddress = generateMvpAddress();
+
+                const dataToSave = { 
+                    address: appState.realAddress, 
+                    mvpAddress: appState.mvpAddress, 
+                    createdAt: Date.now() 
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+                
+                document.getElementById('trunc-addr').innerText = appState.realAddress.substring(0, 10) + "......" + appState.realAddress.slice(-10);
+                
+                closeImportModal();
+                hideLoading();
+                
+                nav('dashboard');
+                refreshBalances();
+                startBalanceInterval();
+                
+                showPopup("Wallet imported successfully!");
+            } catch (e) {
+                hideLoading();
+                console.error(e);
+                showPopup("Invalid Recovery Phrase");
+            }
+        }
+        
+        function copyToClipboard(text, successMsg = "Copied") {
+            if (!text) return;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showPopup(successMsg);
+                }).catch(() => { fallbackCopy(text, successMsg); });
+            } else { fallbackCopy(text, successMsg); }
+        }
+
+        function fallbackCopy(text, successMsg) {
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                textArea.style.top = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (successful) showPopup(successMsg);
+                else showPopup("Failed to copy");
+            } catch (err) { showPopup("Failed to copy"); }
+        }
+        
+        let isCopying = false;
+        function handleCopy() {
+            if (isCopying) return;
+            isCopying = true;
+            const addr = appState.currentReceiveMode === 'wallet' ? appState.realAddress : appState.mvpAddress;
+            copyToClipboard(addr, "Copy successful");
+            setTimeout(() => { isCopying = false; }, 1500);
+        }
+        
+        function copyTxHash(hash) {
+            if (isCopying) return;
+            isCopying = true;
+            copyToClipboard(hash, "Hash copied");
+            setTimeout(() => { isCopying = false; }, 1500);
+        }
+
+        let toastTimeout;
+        function showPopup(msg) {
+            const t = document.getElementById('toast-popup');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            t.innerText = msg;
+            t.style.display = 'block';
+            t.style.opacity = '1';
+            toastTimeout = setTimeout(() => { t.style.display = 'none'; }, 2000);
+        }
+
+        function showLoading(text) {
+            document.getElementById('loading-text').innerText = text || "Processing...";
+            document.getElementById('loading-overlay').classList.add('active');
+        }
+
+        function hideLoading() { document.getElementById('loading-overlay').classList.remove('active'); }
+
+        window.addEventListener('beforeunload', () => { appState.tempPrivateKey = null; appState.tronWeb = null; appState.pendingSend = null; });
+    </script>
+</body>
+</html>
